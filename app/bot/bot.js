@@ -26,22 +26,22 @@ module.exports = function() {
                 // Check exists and collect t.id_str
                 // Filtering unwanted keywords:
                 // followme, followback, `follow back`
-                if (shouldCollectFilter(t.text, user)) {
+                if (shouldCollectFilter(t, user)) {
                     User.findByIdAndUpdate(user.id, {
-                        $addToSet: {
-                            'userPublic.bot.stream': {
-                                tweet_date: t.created_at,
-                                tweet_id: t.id_str,
-                                tweet_text: t.text,
-                                tweet_user: t.user
+                            $addToSet: {
+                                'userPublic.bot.stream': {
+                                    tweet_date: t.created_at,
+                                    tweet_id: t.id_str,
+                                    tweet_text: t.text,
+                                    tweet_user: t.user
+                                }
                             }
-                        }
-                    },
-                    function(err, user) {
-                        debug(user.login.twitter.username + ' has collected ' + (user.userPublic.bot.stream.length + 1) + ' tweets with keywords: ' + user.userPublic.fav_criteria.keywords.filter(function(e) {
-                            return e
-                        }))
-                    })
+                        },
+                        function(err, user) {
+                            debug(user.login.twitter.username + ' has collected ' + (user.userPublic.bot.stream.length + 1) + ' tweets with keywords: ' + user.userPublic.fav_criteria.keywords.filter(function(e) {
+                                return e
+                            }))
+                        })
                 }
             })
 
@@ -65,14 +65,30 @@ module.exports = function() {
 };
 
 // Helpers
-function shouldCollectFilter(text, user) {
-	var hasWord = false;
-	for(var i = 0; i < user.userPublic.fav_criteria.unwanted_keywords.length; i++) {
-		if(text.toLowerCase().indexOf(user.userPublic.fav_criteria.unwanted_keywords[i].toLowerCase()) > -1) {
-			debug('Tweet has unwanted word: ' + user.userPublic.fav_criteria.unwanted_keywords[i]);
-			hasWord = true;
-			break;
-		}
-	}
-	return !hasWord;
+function shouldCollectFilter(t, user) {
+    var hasWord = false;
+    var tUser = t.user;
+    // Rules
+    var options = {};
+
+    if (t.filter_level !== 'none' &&
+        !t.possibly_sensitive &&
+        !t.favorited && // Have not favorited
+        (tUser.description && tUser.description.length > 5) &&
+        tUser.friends_count > 100 &&
+        tUser.favourites_count > 10 &&
+        tUser.statuses_count > 100
+    ) {
+        for (var i = 0; i < user.userPublic.fav_criteria.unwanted_keywords.length; i++) {
+        	// TODO: Improve this using regex!
+            if (t.text.toLowerCase().indexOf(user.userPublic.fav_criteria.unwanted_keywords[i].toLowerCase()) > -1) {
+                debug('Tweet has unwanted word: ' + user.userPublic.fav_criteria.unwanted_keywords[i]);
+                hasWord = true;
+                break;
+            }
+        }
+    } else {
+        hasWord = true;
+    }
+    return !hasWord;
 }

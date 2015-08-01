@@ -47,6 +47,12 @@ block content
 		each val in user.userPublic.fav_criteria.unwanted_keywords
 			+unwantedKeywordInput(val)
 
+		// Add more input fields
+		- var n = user.userPublic.fav_criteria.unwanted_keywords.length
+		while n < 10
+			.hidden= n++
+			+unwantedKeywordInput()
+
 		br
 		input(type='submit', value='update', id='updateSubmit')
 
