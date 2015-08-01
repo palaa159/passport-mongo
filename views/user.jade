@@ -1,0 +1,56 @@
+// Mixins
+mixin keywordInput(val)
+	input.keyordInput(type='text', placeholder='Enter your keyword', value=val, name='keyword')
+	br
+mixin unwantedKeywordInput(val)
+	input.unwantedKeywordInput(type='text', placeholder='Enter your unwanted keyword', value=val, name='unwantedKeyword')
+	br
+
+extends layout
+
+block content
+	include ./includes/user-header.jade
+
+	hr
+	h2 Status
+	if user.userPublic.bot.status.title
+		p Running
+	else
+		p Stop
+	- var perMin = Math.ceil((((new Date().getTime()) - (new Date(user.userPublic.bot.status.date).getTime()))/1000)/60)
+	p Tweets collected: #{user.userPublic.bot.stream.length} (#{Math.ceil(user.userPublic.bot.stream.length/perMin)} tweets/min)
+	p Tweets favorited: #{user.userPublic.bot.favorited_tweets.length}
+	p Later, this will be a nice beautiful toggle :)
+	if user.userPublic.bot.status.title
+		button#botStartStop(data-bot='false') stop
+	else
+		button#botStartStop(data-bot='true') start
+	img.hidden.spinner(src='/images/ajax.gif', width='24', height='24')
+
+	hr
+	h2 Favorite criteria
+		button add
+
+	// Form
+	form(method='POST', action='/user/update')
+		h3 Keywords
+		each val in user.userPublic.fav_criteria.keywords
+			+keywordInput(val)
+			
+		// Add more input fields
+		- var n = user.userPublic.fav_criteria.keywords.length
+		while n < 5
+			.hidden= n++
+			+keywordInput()
+		
+		h3 Unwanted keywords
+		each val in user.userPublic.fav_criteria.unwanted_keywords
+			+unwantedKeywordInput(val)
+
+		br
+		input(type='submit', value='update', id='updateSubmit')
+
+	// Dependencies
+	include ./includes/scripts.jade
+	// Page-specific Script
+	script(src='/javascripts/user.js')

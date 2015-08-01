@@ -1,0 +1,10 @@
+a(href='/user') dash
+span  |  
+a(href='/user/tweets') tweets
+span  | 
+a(href='/auth/logout') logout
+
+h1 hello, #{user.login.twitter.username}
+p token: #{user.login.twitter.token}
+p secret_token: #{user.login.twitter.tokenSecret}
+p #{user.userPublic.fav_criteria}

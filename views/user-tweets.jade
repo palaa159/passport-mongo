@@ -1,0 +1,7 @@
+extends layout
+
+block content
+	include ./includes/user-header.jade
+
+	each tweet in user.userPublic.bot.stream.reverse()
+		li= tweet.tweet_text
