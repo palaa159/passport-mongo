@@ -3,5 +3,15 @@ extends layout
 block content
 	include ./includes/user-header.jade
 
-	each tweet in user.userPublic.bot.stream.reverse()
+	// each tweet in user.userPublic.bot.stream.reverse()
+		li= tweet.tweet_text
+
+	- for(var i = 1; i <= parseInt(pages); i++) {
+		span
+			a(href='/user/tweets/#{i}')= i
+		span  | 
+	- }
+	br
+	br
+	each tweet in tweets
 		li= tweet.tweet_text

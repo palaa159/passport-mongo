@@ -7,7 +7,7 @@ var Bot = require('../bot/bot')()
     /* GET users listing. */
 
 // Collect IP Address
-router.use(function(req, res, next) {
+router.all('*', isLoggedIn, function(req, res, next) {
     User.findByIdAndUpdate(req.session.passport.user, {
             'userPrivate.lastActive': {
                 ip: req.ip,
@@ -47,10 +47,34 @@ router.get('/', function(req, res, next) {
  *	GET /user/tweets
  *	See list of tweets
  **/
-router.get('/tweets', function(req, res, next) {
-    res.render('user-tweets', {
-        user: req.user
-    })
+router.get('/tweets/:page?', function(req, res, next) {
+    // Check if input is a number
+    debug('query page: ' + req.params.page)
+    if (req.params && !isNaN(req.params.page) && req.params.page >= 1) {
+    	var page = req.params.page
+        var tweetPerPage = 50
+            // Mongo Logic
+        User.findOne(req.session.passport.user, function(err, user) {
+            if (err) {
+                debug(err)
+                res.end('Err, no such user')
+            }
+            if (user) {
+                var nOfTweets = user.userPublic.bot.stream.length
+                var nOfPages = Math.ceil(nOfTweets / tweetPerPage)
+                var tweetsToReturn = user.userPublic.bot.stream.reverse().slice((page - 1) * tweetPerPage, page * tweetPerPage)
+                res.render('user-tweets', {
+                    user: req.user,
+                    tweets: tweetsToReturn,
+                    pages: nOfPages
+                })
+            }
+        });
+    } else {
+    	res.redirect('/user')
+    }
+
+
 })
 
 /**
@@ -132,6 +156,18 @@ module.exports = router
 /**
  * Helper
  **/
+
+// route middleware to make sure a user is logged in
+function isLoggedIn(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated())
+        return next()
+
+    // if they aren't redirect them to the home page
+    res.redirect('/')
+}
+
 function isBodyBoolean(req, res, next) {
     if (typeof(JSON.parse(req.body.status)) === 'boolean') {
         next()

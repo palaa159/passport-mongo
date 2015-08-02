@@ -71,7 +71,7 @@ app.use(passport.session())
 
 app.use('/', routes)
 app.use('/auth', auth)
-app.use('/user', isLoggedIn, user)
+app.use('/user', user)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -108,17 +108,6 @@ app.use(function(err, req, res, next) {
 // When the server restarted, stop all the bots
 function init() {
 
-}
-
-// route middleware to make sure a user is logged in
-function isLoggedIn(req, res, next) {
-
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
-        return next()
-
-    // if they aren't redirect them to the home page
-    res.redirect('/')
 }
 
 module.exports = app;
