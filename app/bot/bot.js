@@ -69,15 +69,15 @@ function shouldCollectFilter(t, user) {
     var hasWord = false;
     var tUser = t.user;
     // Rules
-    var options = {};
+    var multiplier = 100;
 
     if (t.filter_level !== 'none' &&
         !t.possibly_sensitive &&
         !t.favorited && // Have not favorited
         (tUser.description && tUser.description.length > 5) &&
-        tUser.friends_count > 100 &&
-        tUser.favourites_count > 10 &&
-        tUser.statuses_count > 100
+        tUser.friends_count > 100 * multiplier &&
+        tUser.favourites_count > 10 * multiplier &&
+        tUser.statuses_count > 100 * multiplier
     ) {
         for (var i = 0; i < user.userPublic.fav_criteria.unwanted_keywords.length; i++) {
         	// TODO: Improve this using regex!
