@@ -17,9 +17,6 @@ var flash = require('express-flash')
 
 var app = express()
 
-// Global TwitterBot
-global.bots = {}
-
 // Mongo config
 var session = require('express-session')
 var MongoStore = require('connect-mongo')(session)

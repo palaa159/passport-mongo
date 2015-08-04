@@ -54,12 +54,19 @@ var userSchema = mongoose.Schema({
                 tweet_text: String,
                 tweet_user: {}
             }],
+            // favorited_tweets
+            // also includes unfavorited ones
             favorited_tweets: [{
                 tweet_id: String,
                 date: Date
             }],
             favorite_limit: Number,
-            unfavorite_limit: Number
+            unfavorite_limit: Number,
+            // level of hostility
+            aggressiveness: {
+                type: Number,
+                default: 1
+            }
         },
         fav_criteria: {
             keywords: {

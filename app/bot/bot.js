@@ -1,65 +1,66 @@
 // ./bot/bot.js
 // Here we build the robot
+// Based on https://github.com/ttezel/twit/blob/master/examples/bot.js
+
 var debug = require('debug')('app:bot')
 var Twit = require('twit')
 var auth = require('../config/auth')
 var User = require('../models/user')
 
+var Bot = module.exports = function(userId, token, secret) {
+    this.userId = userId; // ID in mongo
+    this.twit = new Twit({
+        consumer_key: auth.twitterAuth.consumerKey,
+        consumer_secret: auth.twitterAuth.consumerSecret,
+        access_token: token,
+        access_token_secret: secret
+    })
+}
+
+Bot.prototype.tweet = function(status, cb) {
+    if (typeof status !== 'string') {
+        return cb(new Error('tweet must be of type String'));
+    } else if (status.length > 140) {
+        return cb(new Error('tweet is too long: ' + status.length));
+    }
+    this.twit.post('statuses/update', {
+        status: status
+    }, cb);
+};
+
+Bot.prototype.searchStatus = function(params, cb) {
+    if (params) { // TODO: Validate parameters
+        this.twit.get('search/tweets', params, function(err, reply) {
+            // Compute all incoming tweets
+            // Pull favorited_tweets
+        })
+    }
+}
+
+Bot.prototype.getUserFollowers = function() {
+
+};
+
+Bot.prototype.favoriteStatus = function() {
+
+};
+
+Bot.prototype.unfavoriteStatus = function() {
+
+};
+
+// Helpers
+function handleError(err) {
+    debug('response status:', err.statusCode);
+    debug('data:', err.data);
+}
+
+/*
 module.exports = function() {
     var service = {};
 
-    service.create = function(user, cb) {
-        if (bots) {
-            bots[user.id] = {
-                twit: new Twit({
-                    consumer_key: auth.twitterAuth.consumerKey,
-                    consumer_secret: auth.twitterAuth.consumerSecret,
-                    access_token: user.login.twitter.token,
-                    access_token_secret: user.login.twitter.tokenSecret
-                })
-            }
-            var thisBot = bots[user.id]
-            thisBot.stream = thisBot.twit.stream('statuses/filter', {
-                track: user.userPublic.fav_criteria.keywords
-            })
-            thisBot.stream.on('tweet', function(t) {
-                // Check exists and collect t.id_str
-                // Filtering unwanted keywords:
-                // followme, followback, `follow back`
-                if (shouldCollectFilter(t, user)) {
-                    User.findByIdAndUpdate(user.id, {
-                            $addToSet: {
-                                'userPublic.bot.stream': {
-                                    tweet_date: t.created_at,
-                                    tweet_id: t.id_str,
-                                    tweet_text: t.text,
-                                    tweet_user: t.user
-                                }
-                            }
-                        },
-                        function(err, user) {
-                            debug(user.login.twitter.username + ' has collected ' + (user.userPublic.bot.stream.length + 1) + ' tweets with keywords: ' + user.userPublic.fav_criteria.keywords.filter(function(e) {
-                                return e
-                            }))
-                        })
-                }
-            })
-
-            // TODO: Catch stream Error
-        }
-        if (cb) cb();
-    };
-
-    service.kill = function(user, cb) {
-        if (bots && bots[user.id]) {
-            // debug(bots)
-            // debug(user.id)
-            // Stop stream
-            // stream.stop()
-            bots[user.id].stream.stop()
-        }
-        if (cb) cb();
-    }
+    // search for keywords
+    service.searchKeyword
 
     return service;
 };
@@ -91,4 +92,4 @@ function shouldCollectFilter(t, user) {
         hasWord = true;
     }
     return !hasWord;
-}
+}*/
