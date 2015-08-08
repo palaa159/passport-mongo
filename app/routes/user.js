@@ -3,7 +3,7 @@ var express = require('express')
 var router = express.Router()
 var User = require('../models/user')
 
-var Bot = require('../bot/bot')()
+// var Bot = require('../bot/bot')()
     /* GET users listing. */
 
 // Collect IP Address
@@ -99,12 +99,12 @@ router.post('/update', function(req, res) {
                 debug('%s\'s favorite criteria is updated', req.session.passport.user)
                 // restart bot
                 debug(user.userPublic.fav_criteria.unwanted_keywords)
-                Bot.kill(user, function() {
-                    debug('Bot stopped')
-                    Bot.create(user, function() {
-                        debug('Bot started')
-                    })
-                })
+                // Bot.kill(user, function() {
+                //     debug('Bot stopped')
+                //     Bot.create(user, function() {
+                //         debug('Bot started')
+                //     })
+                // })
                 res.json({
                     success: true
                 })
@@ -131,16 +131,16 @@ router.post('/bot', isBodyBoolean, function(req, res) {
         }
         if (user) {
             if (req.body.status === "true") {
-                Bot.kill(user, function() {
-                    debug('Bot stopped')
-                    Bot.create(user, function() {
-                        debug('Bot started')
-                    })
-                })
+                // Bot.kill(user, function() {
+                //     debug('Bot stopped')
+                //     Bot.create(user, function() {
+                //         debug('Bot started')
+                //     })
+                // })
             } else if (req.body.status === "false") {
-                Bot.kill(user, function() {
-                    debug('Bot Stopped')
-                })
+                // Bot.kill(user, function() {
+                //     debug('Bot Stopped')
+                // })
             }
 
             res.json({
